@@ -22,8 +22,8 @@ BEGIN
        RESIGNAL;
     END;
 
-  drop temporary table if exists tmp_weighted_results;
-  create temporary table tmp_weighted_results (
+  drop  table if exists tmp_weighted_results;
+  create table tmp_weighted_results (
     `player_id` int(10) unsigned NOT NULL,
     `name` VARCHAR(99) NOT NULL,
     `rating` int(10) unsigned NOT NULL,
@@ -38,8 +38,8 @@ BEGIN
     PRIMARY KEY (`player_id`)
   ) DEFAULT CHARSET=utf8;
 
-  drop temporary table if exists tmp_event_win_loss;
-  create temporary table tmp_event_win_loss
+  drop table if exists tmp_event_win_loss;
+  create table tmp_event_win_loss
   SELECT *
     FROM (
       SELECT p.id, p.name, r.rating, (select COUNT(*) from Result where player_id = p.id) as events,

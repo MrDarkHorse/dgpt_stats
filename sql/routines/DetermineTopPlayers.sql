@@ -21,14 +21,14 @@ BEGIN
       (select SUM(wins) from tmp_event_win_loss_cpy where player_id = p.id AND startdate >= the_startdate AND enddate <= the_enddate) as wins,
       (select SUM(losses) from tmp_event_win_loss_cpy where player_id = p.id AND startdate >= the_startdate AND enddate <= the_enddate) as losses,
       (select SUM(ties) from tmp_event_win_loss_cpy where player_id = p.id AND startdate >= the_startdate AND enddate <= the_enddate) as ties,
-      (select wins / (wins+losses+ties)) as win_pct,
-      (select (events * 10 + (wins+ties)) / events) as qual_pts
+      (select (wins + (ties/2)) / (wins+losses+ties)) as win_pct,
+      (select (events * 10 + (wins + (ties/2)))) as qual_pts
       FROM Player AS p
       JOIN Result AS r ON p.id = r.player_id
       JOIN QualifyingEvents AS e ON e.pdga_event_id = r.event_id
       WHERE r.rating > 1000
       GROUP BY r.player_id
-      ORDER BY qual_pts desc) subquery
+      ORDER BY win_pct desc) subquery
     WHERE events > 7
     LIMIT the_num_qualifying_players;
 
@@ -51,8 +51,8 @@ BEGIN
      where (`r`.`rating` > 999)
      and startdate >= the_startdate
      and enddate <= the_enddate
-     and r.pdga_event_id IN (SELECT pdga_event_id FROM QualifyingEvents)
-     group by `e`.`event_id`,`r`.`player_id`
+     and r.event_id IN (SELECT pdga_event_id FROM QualifyingEvents)
+     group by `e`.`pdga_event_id`,`r`.`player_id`
      order by `e`.`id`,`wins` desc;
 
 END;;
