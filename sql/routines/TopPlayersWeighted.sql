@@ -3,7 +3,7 @@
 DROP PROCEDURE IF EXISTS `TopPlayersWeighted`;
 
 DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` PROCEDURE `TopPlayersWeighted`(the_startdate DATETIME, the_enddate DATETIME, the_weight_degredation FLOAT, the_num_qualifying_players_considered INT, the_num_qualifying_players INT)
+CREATE DEFINER=`root`@`localhost` PROCEDURE `TopPlayersWeighted`(the_startdate DATETIME, the_enddate DATETIME, the_weight_degredation FLOAT, the_num_qualifying_players INT, the_num_top_players INT, the_num_prerank INT, the_num_ranked_players INT)
     READS SQL DATA
     SQL SECURITY INVOKER
 BEGIN
@@ -18,13 +18,13 @@ END IF;
 
 START TRANSACTION;
 
-CALL DetermineTopPlayers(the_startdate, the_enddate, the_weight_degredation, the_num_qualifying_players_considered);
-CALL DetermineWeightedScores(the_startdate, the_enddate, the_weight_degredation, the_num_qualifying_players);
+CALL DetermineTopPlayers(the_startdate, the_enddate, the_weight_degredation, the_num_qualifying_players, the_num_top_players);
+CALL DetermineWeightedScores(the_startdate, the_enddate, the_weight_degredation, the_num_prerank);
 
 SELECT *
 FROM tmp_weighted_results
 ORDER BY weighted_win_pct desc
-LIMIT the_num_qualifying_players;
+LIMIT the_num_ranked_players;
 
 COMMIT;
 
